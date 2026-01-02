@@ -25,13 +25,27 @@ def has_point(x, y, base_density):
     return rand01(x, y, 9999) < local_density(x, y, base_density)
 
 
-def make_backgroud(world_position):
-    surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+def make_background(world_position):
+
+    surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
     surface.fill(SKY_BLUE)
 
-    for x in range(0, SCREEN_WIDTH, 10):
-        for y in range(0, SCREEN_HEIGHT, 10):
-            if has_point(world_position.x + x, world_position.y + y, CLOUD_DENSITY):
-                pygame.draw.circle(surface, WHITE, (x, y), 10)
+    for x in range(0, int(SCREEN_WIDTH / 10)):
+        for y in range(0, int(SCREEN_HEIGHT / 10)):
+            if has_point(
+                round(world_position.x) + x, round(world_position.y) + y, CLOUD_DENSITY
+            ):
+
+                pygame.draw.circle(
+                    surface,
+                    WHITE,
+                    (
+                        (
+                            (world_position.x % 1) + x * 10,
+                            (world_position.y % 1) + y * 10,
+                        ),
+                    ),
+                    10,
+                )
 
     return surface
