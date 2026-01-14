@@ -45,23 +45,24 @@ def main():
     plane = Plane(pygame.math.Vector2(0, 0))
     missiles = Missiles()
     missiles.spawn_missile(plane)
-    background = make_background(camera.position)
+    # background = make_background(camera.position)
 
     run = True
     while run:
+        dt = clock.tick(FPS) / 1000
 
         control_plane(plane, missiles.get_visable(plane))
-        prev_background = background
+
         background = make_background(camera.position)
-        prev_background.set_alpha(50)
-        background.blit(prev_background, (0, 0))
+
         win.blit(background, (0, 0))
 
         if len(missiles.missiles) < 3:
             missiles.spawn_missile(plane)
 
-        plane.update(missiles.missiles[0])
-        missiles.update(plane)
+        plane.update(dt)
+
+        missiles.update(dt, plane)
 
         camera.update(plane)
 
@@ -70,14 +71,10 @@ def main():
         missiles.draw(win, camera)
 
         label = myfont.render(
-            f"{plane.hits},({round(plane.x)},{round(plane.y)})",
+            f"{plane.hits},({round(plane.x)},{round(plane.y)}, {clock.get_fps()})",
             1,
             (128, 255, 128),
         )
-        win.blit(label, (10, 10))
-        pygame.display.flip()
-        clock.tick(120)
-        win.fill((255, 255, 255))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -87,6 +84,12 @@ def main():
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     run = False
+
+        win.blit(label, (10, 10))
+        pygame.display.flip()
+        clock.tick(FPS)
+
+        win.fill((255, 255, 255))
 
 
 if __name__ == "__main__":

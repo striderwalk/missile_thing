@@ -76,7 +76,7 @@ class Missile:
     def limit_speed(self):
         self.velocity = self.velocity.normalize() * MISSILE_SPEED
 
-    def update(self, plane):
+    def update(self, dt, plane):
         self.lifetime -= 0
         if self.lifetime < 0:
             self.active = False
@@ -88,7 +88,7 @@ class Missile:
         # upate movemnt
         self.update_heading()
         self.limit_speed()
-        self.position += self.velocity
+        self.position += self.velocity * dt
 
         if distance(self, plane) < 35:
             self.has_seen_plane = True
@@ -109,12 +109,12 @@ class Missiles:
         for missile in self.missiles:
             win.blit(missile.get_image(), camera.apply(missile.position))
 
-    def update(self, plane):
+    def update(self, dt, plane):
         removals = []
         for missile in self.missiles:
             if missile.active:
                 control_missile(missile, plane)
-                missile.update(plane)
+                missile.update(dt, plane)
             else:
                 removals.append(missile)
 

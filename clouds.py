@@ -1,51 +1,83 @@
-import hashlib
-import random
+import math
 
 import pygame
-from noise import pnoise2
+from pygame.math import Vector2 as Vector
 
 from consts import *
 
-# seed = random.randint(1, 1000)
-seed = 1
+
+def hash2d(x: int, y: int, seed: int = 0) -> float:
+    """
+    Deterministic hash from 2 ints → float in [0, 1)
+    """
+    n = int(x * 374761393 + y * 668265263 + seed * 1442695040888963407)
+    n = (n ^ (n >> 13)) * 1274126177
+    n = n ^ (n >> 16)
+    return (n & 0xFFFFFFFF) / 0x100000000
 
 
-def rand01(x, y, seed=0):
-    key = f"{x},{y},{seed}".encode()
-    h = hashlib.sha256(key).digest()
-    return int.from_bytes(h, "big") / 2**256
+def get_clouds(cam_x, cam_y, cam_w, cam_h, seed=1):
+
+    clouds = []
+
+    # Determine grid bounds
+    x0 = math.floor((cam_x) / CELL_SIZE)
+    y0 = math.floor((cam_y) / CELL_SIZE)
+    x1 = math.floor((cam_x + cam_w) / CELL_SIZE)
+    y1 = math.floor((cam_y + cam_h) / CELL_SIZE)
+
+    for gx in range(x0, x1 + 1):
+        for gy in range(y0, y1 + 1):
+
+            # Decide if this cell has a cloud
+            h = hash2d(gx, gy, seed)
+            if h < CLOUD_DENSITY:
+                continue
+
+            # Jitter inside the cell
+            jx = hash2d(gx, gy, seed + 1)
+            jy = hash2d(gx, gy, seed + 2)
+
+            cx = (gx + jx) * CELL_SIZE
+            cy = (gy + jy) * CELL_SIZE
+
+            # Optional size variation
+            size = 0.6 + 0.8 * hash2d(gx, gy, seed + 3)
+
+            # Cull precisely to camera bounds
+            if cam_x <= cx <= cam_x + cam_w and cam_y <= cy <= cam_y + cam_h:
+                clouds.append((Vector(cx, cy), size))
+
+    return clouds
 
 
-def local_density(x, y, base_density):
-    n = (pnoise2(x * 0.01, y * 0.01, base=seed) + 1) / 2
-    return base_density * n
+def make_background(world_position, margin=1000):
 
+    padded_surface = pygame.Surface(
+        (SCREEN_WIDTH + margin * 2, SCREEN_HEIGHT + margin * 2), pygame.SRCALPHA
+    )
+    padded_surface.fill(SKY_BLUE)
 
-def has_point(x, y, base_density):
-    return rand01(x, y, 9999) < local_density(x, y, base_density)
+    for cloud_position, cloud_size in get_clouds(
+        world_position.x - margin,
+        world_position.y - margin,
+        SCREEN_WIDTH + margin * 2,
+        SCREEN_HEIGHT + margin * 2,
+        margin,
+    ):
 
-
-def make_background(world_position):
-
+        pygame.draw.circle(
+            padded_surface,
+            WHITE,
+            cloud_position - world_position + Vector(margin, margin),
+            50 * cloud_size,
+        )
     surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-    surface.fill(SKY_BLUE)
-
-    for x in range(0, int(SCREEN_WIDTH / 10)):
-        for y in range(0, int(SCREEN_HEIGHT / 10)):
-            if has_point(
-                round(world_position.x) + x, round(world_position.y) + y, CLOUD_DENSITY
-            ):
-
-                pygame.draw.circle(
-                    surface,
-                    WHITE,
-                    (
-                        (
-                            (world_position.x % 1) + x * 10,
-                            (world_position.y % 1) + y * 10,
-                        ),
-                    ),
-                    10,
-                )
+    surface.blit(padded_surface, (0, 0), (margin, margin, SCREEN_WIDTH, SCREEN_HEIGHT))
 
     return surface
+
+
+for i in range(10):
+    for j in range(10):
+        print(hash2d(i, j, 1))
