@@ -1,8 +1,11 @@
-import random
 import math
+import random
+
 import pygame
 from pygame.math import Vector2 as Vector
+
 from consts import *
+from flyer import Flyer
 
 
 def random_vector():
@@ -16,18 +19,18 @@ def distance(this, that):
     return math.hypot(a.x - b.x, a.y - b.y)
 
 
-class Missile:
+class Missile(Flyer):
+
+    max_speed = MISSILE_SPEED
+    turning_speed = MISSILE_TURNING_RADIUS
+
     def __init__(self, position, velocity):
-        self.position = position
-        self.velocity = velocity
-        self.acceleration = Vector(0, 0)
+        super().__init__(position, velocity)
+
         self.has_seen_plane = False
         self.active = True
         self.been_hit = False
-        self.lifetime = random.randint(25, 50)
-
-        self.heading = 0
-        self.target_heading = 0
+        self.lifetime = random.randint(500, 1500)
 
         self.rect = pygame.Rect(self.x, self.y, 20, 20)
 
@@ -37,7 +40,7 @@ class Missile:
         surface = pygame.Surface((40, 40), pygame.SRCALPHA)
 
         surface.fill((255, 0, 0, 0))
-        vel = self.velocity * 15 / FPS / 10
+        vel = self.velocity.normalize() * 15
 
         pygame.draw.line(
             surface,
@@ -47,43 +50,27 @@ class Missile:
             5,
         )
         if self.active:
-            pygame.draw.circle(surface, (255, 128, 255), (20 + vel.x, 20 + vel.y), 2)
+            pygame.draw.circle(
+                surface,
+                (
+                    255,
+                    128,
+                    255,
+                    255 if self.lifetime > FPS * 5 else 255 * self.lifetime / (FPS * 5),
+                ),
+                (20 + vel.x, 20 + vel.y),
+                2,
+            )
 
         return surface
-
-    @property
-    def x(self):
-        return self.position.x
-
-    @property
-    def y(self):
-        return self.position.y
-
-    def update_heading(self):
-        dheading = self.heading - self.target_heading
-
-        if abs(dheading) < MISSILE_TURNING_RADIUS:
-            self.heading += dheading
-        else:
-            self.heading += MISSILE_TURNING_RADIUS * dheading / abs(dheading)
-
-        new_x = math.sin(self.heading)
-        new_y = math.cos(self.heading)
-        self.velocity = Vector(new_x, new_y)
 
     def hit(self):
         self.been_hit = True
         self.active = False
 
-    def limit_speed(self):
-        self.velocity = self.velocity.normalize() * MISSILE_SPEED
-
-    def set_target_heading(self, target):
-        self.target_heading = target % (math.pi * 2)
-
     def update(self, dt, plane):
 
-        self.lifetime -= dt
+        self.lifetime -= 1
         if self.lifetime < 0:
             self.active = False
             return
@@ -95,19 +82,18 @@ class Missile:
         if not self.active:
             return
 
-        # upate movemnt
-        self.update_heading()
-        self.limit_speed()
-        self.position += self.velocity * dt
+        self.has_seen_plane |= distance(self, plane) < 35
 
-        if distance(self, plane) < 35:
-            self.has_seen_plane = True
+        self.update_movement(dt)
 
 
 class Missiles:
 
     def __init__(self):
         self.missiles = []
+
+    def __iter__(self):
+        yield from self.missiles
 
     def add(self, missile):
         self.missiles.append(missile)
@@ -120,6 +106,8 @@ class Missiles:
             win.blit(missile.get_image(), camera.apply(missile.position))
 
     def update(self, dt, plane):
+        if len(self.missiles) < MISSILE_NUMBER:
+            self.spawn_missile(plane)
         removals = []
         for missile in self.missiles:
             if missile.active and not missile.been_hit:
@@ -131,36 +119,12 @@ class Missiles:
         for missile in removals:
             self.remove(missile)
 
-        return self.hits(plane)
-
     def spawn_missile(self, plane):
 
         position = random_vector() * SPAWN_RADIUS + plane.position
         missileToPlane = position - plane.position
         # turn a lil bit
         self.add(Missile(position, missileToPlane))
-
-    def hits(self, plane):
-        hit_list = []
-        for missile in self.missiles:
-            if missile.been_hit:
-                continue
-            if distance(missile, plane) < 5:
-                missile.hit()
-                plane.hit()
-                hit_list.append(missile.position)
-
-            for other in self.missiles:
-                if other.been_hit:
-                    continue
-                if missile is other:
-                    continue
-                if distance(missile, other) < 5:
-                    hit_list.append(missile.position)
-
-                    missile.hit()
-                    other.hit()
-        return hit_list
 
     def get_visable(self, plane):
         visable = []
@@ -179,17 +143,17 @@ class Missiles:
 def control_missile(missile, plane, dt):
     m2p = -missile.position + plane.position
 
-    t = math.atan2(m2p.x, m2p.y)
+    t = math.atan2(m2p.y, m2p.x)
 
     if not missile.has_seen_plane:
 
         missile.heading = t
         missile.target_heading = t
 
-    # missile.target_heading = t
-    new_heading, los_angle = missile_guidance(missile, plane, missile.los_angle, dt)
-    missile.set_target_heading(new_heading)
-    missile.los_angle = los_angle
+    missile.target_heading = t
+    # new_heading, los_angle = missile_guidance(missile, plane, missile.los_angle, dt)
+    # missile.set_target_heading(new_heading)
+    # missile.los_angle = los_angle
 
 
 # CHAT GPT
@@ -227,7 +191,7 @@ def missile_guidance(
     rel = plane.position - missile.position
 
     # Line-of-sight angle
-    los_angle = math.atan2(rel.y, rel.x)
+    los_angle = math.atan2(rel.x, rel.y)
 
     # LOS rate (angular velocity)
     los_rate = signed_angle_diff(los_angle, prev_los_angle) / dt
