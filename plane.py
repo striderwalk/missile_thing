@@ -49,8 +49,8 @@ class Plane:
             self.heading += PLANE_TURNING_RADIUS * dheading / abs(dheading)
 
         x, y = (0, 1)
-        new_x = math.sin(self.heading * (math.pi * 2 / 360))
-        new_y = math.cos(self.heading * (math.pi * 2 / 360))
+        new_x = math.sin(self.heading)
+        new_y = math.cos(self.heading)
         self.velocity = Vector(new_x, new_y)
 
     def hit(self):
@@ -75,4 +75,4 @@ def control_plane(plane, missiles):
     nearest = min(missiles, key=lambda x: distance(x, plane))
 
     if distance(nearest, plane) < 55:
-        plane.set_heading(plane.heading + 90)
+        plane.set_heading(plane.heading + math.pi / 2)

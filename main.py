@@ -10,6 +10,7 @@ from consts import *
 from missile import Missile, Missiles
 from plane import Plane, control_plane
 from clouds import make_background
+from explosion import Explosions
 
 
 class Camera:
@@ -45,6 +46,7 @@ def main():
     plane = Plane(pygame.math.Vector2(0, 0))
     missiles = Missiles()
     missiles.spawn_missile(plane)
+    explosions = Explosions()
     # background = make_background(camera.position)
 
     run = True
@@ -57,16 +59,20 @@ def main():
 
         win.blit(background, (0, 0))
 
-        if len(missiles.missiles) < 3:
+        if len(missiles.missiles) < 5:
             missiles.spawn_missile(plane)
 
         plane.update(dt)
 
-        missiles.update(dt, plane)
+        hits = missiles.update(dt, plane)
+        for hit in hits:
+            explosions.add(hit)
 
+        explosions.update()
         camera.update(plane)
 
         win.blit(plane.get_image(), camera.apply(plane.position))
+        explosions.draw(win, camera)
 
         missiles.draw(win, camera)
 

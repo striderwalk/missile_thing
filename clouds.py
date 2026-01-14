@@ -76,8 +76,3 @@ def make_background(world_position, margin=1000):
     surface.blit(padded_surface, (0, 0), (margin, margin, SCREEN_WIDTH, SCREEN_HEIGHT))
 
     return surface
-
-
-for i in range(10):
-    for j in range(10):
-        print(hash2d(i, j, 1))
