@@ -91,6 +91,5 @@ def main(display=True):
 
 
 if __name__ == "__main__":
-<<<<<<< HEAD
+
     print(main())
->>>>>>>>> Temporary merge branch 2
