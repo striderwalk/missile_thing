@@ -29,7 +29,8 @@ class PlaneGame:
     def run(self):
 
         while self.sim.active:
-            dt = self.clock.tick(FPS)
+            dt = self.clock.tick(FPS) / 1000
+
             self.update(dt)
             if self.render:
 

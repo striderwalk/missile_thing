@@ -1,5 +1,7 @@
 import math
 
+from .sim_consts import *
+
 
 def distance(this, that):
     a = this.position
@@ -14,7 +16,7 @@ def detect_colisions(plane, missiles):
 
         if missile.been_hit:
             continue
-        if distance(missile, plane) < 5:
+        if distance(missile, plane) < HIT_RADIUS:
             missile.hit()
             plane.hit()
             hit_list.append(missile.position)
@@ -24,7 +26,7 @@ def detect_colisions(plane, missiles):
                 continue
             if missile is other:
                 continue
-            if distance(missile, other) < 5:
+            if distance(missile, other) < HIT_RADIUS:
                 hit_list.append(missile.position)
 
                 missile.hit()

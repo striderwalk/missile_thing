@@ -44,7 +44,8 @@ class Simulation:
                 for i in self.missiles.get_visable(self.plane)
             ],
         )
-        self.plane.set_target_heading(new_target)
+        if new_target:
+            self.plane.set_target_heading(new_target)
 
         self.missiles.update(dt, self.plane, self.missile_controller)
         self.explosions.update()

@@ -36,12 +36,12 @@ class Missile(Flyer):
         self.been_hit = False
         self.lifetime = random.randint(500, 1500)
 
-        self.rect = pygame.Rect(self.x, self.y, 20, 20)
+        self.rect = pygame.Rect(self.x, self.y, 40, 40)
 
         self.id = uuid.uuid1()
 
-    def get_image(self):
-        surface = pygame.Surface((40, 40), pygame.SRCALPHA)
+    def get_image(self, debug):
+        surface = pygame.Surface(self.rect.size, pygame.SRCALPHA)
 
         surface.fill((255, 0, 0, 0))
         vel = self.velocity.normalize() * 15
@@ -65,6 +65,9 @@ class Missile(Flyer):
                 (20 + vel.x, 20 + vel.y),
                 2,
             )
+
+        if debug:
+            pygame.draw.circle(surface, (255, 0, 0), (20, 20), HIT_RADIUS / 2, width=3)
 
         return surface
 
@@ -105,9 +108,11 @@ class Missiles:
     def remove(self, missile):
         self.missiles.remove(missile)
 
-    def draw(self, win, camera):
+    def draw(self, win, camera, debug=False):
         for missile in self.missiles:
-            win.blit(missile.get_image(), camera.apply(missile.position))
+            win.blit(
+                missile.get_image(debug), camera.apply(missile.position, missile.rect)
+            )
 
     def update(self, dt, plane, controller):
         if len(self.missiles) < MISSILE_NUMBER:

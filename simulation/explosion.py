@@ -1,6 +1,5 @@
 import pygame
 
-from consts import *
 
 from colours import *
 

@@ -1,3 +1,4 @@
+import pygame
 from pygame.math import Vector2 as Vector
 
 from .disp_consts import *
@@ -15,9 +16,14 @@ class Camera:
     def y(self):
         return self.position.y
 
-    def apply(self, position):
+    def apply(self, position, rect=pygame.Rect(0, 0, 0, 0)):
 
-        return position - self.position + Vector(SCREEN_WIDTH, SCREEN_HEIGHT) / 2
+        return (
+            position
+            - self.position
+            + Vector(SCREEN_WIDTH, SCREEN_HEIGHT) / 2
+            - Vector(rect.size) / 2
+        )
 
     def update(self, plane):
 
