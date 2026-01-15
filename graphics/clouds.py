@@ -8,14 +8,21 @@ from .disp_consts import *
 from colours import *
 
 
-def hash2d(x: int, y: int, seed: int = 0) -> float:
-    """
-    Deterministic hash from 2 ints → float in [0, 1)
-    """
+def hash2d(x, y, seed=0):
     n = int(x * 374761393 + y * 668265263 + seed * 1442695040888963407)
     n = (n ^ (n >> 13)) * 1274126177
     n = n ^ (n >> 16)
     return (n & 0xFFFFFFFF) / 0x100000000
+
+
+def cached_hash2d(x, y, seed=0):
+
+    cache = {}
+    if (x, y, seed) in cache:
+        return cache[(x, y, seed)]
+
+    cache[(x, y, seed)] = hash2d(x, y, seed)
+    return cache[(x, y, seed)]
 
 
 def get_clouds(cam_x, cam_y, cam_w, cam_h, seed=1):
@@ -32,34 +39,36 @@ def get_clouds(cam_x, cam_y, cam_w, cam_h, seed=1):
     for grid_x in range(x0, x1 + 1):
         for grid_y in range(y0, y1 + 1):
 
-            # Decide if this cell has a cloud
-            h = hash2d(grid_x, grid_y, seed)
+            h = cached_hash2d(grid_x, grid_y, seed)
             if h > CLOUD_DENSITY:
                 continue
 
-            # Jitter inside the cell
-            jx = hash2d(grid_x, grid_y, seed + 1)
-            jy = hash2d(grid_x, grid_y, seed + 2)
+            clouds.extend(grid_clouds(grid_x, grid_y, seed))
 
-            cx = (grid_x + jx) * CELL_SIZE
-            cy = (grid_y + jy) * CELL_SIZE
+    return clouds
 
-            clouds.append(make_cloud(grid_x, grid_y, cx, cy, seed))
 
-            for i in range(int(CLUSTER_SIZE * hash2d(grid_x, grid_y, seed + 1))):
-                other_x = CLUSTER_SPREAD * (2 * hash2d(grid_x, grid_y, seed + i) - 0.5)
-                other_y = CLUSTER_SPREAD * (2 * hash2d(grid_x, grid_y, seed - i) - 0.5)
-                clouds.append(
-                    make_cloud(grid_x, grid_y, cx + other_x, cy + other_y, seed)
-                )
+def grid_clouds(grid_x, grid_y, seed):
+    clouds = []
+    offset_x = cached_hash2d(grid_x, grid_y, seed + 1)
+    offset_y = cached_hash2d(grid_x, grid_y, seed + 2)
 
+    cx = (grid_x + offset_x) * CELL_SIZE
+    cy = (grid_y + offset_y) * CELL_SIZE
+
+    clouds.append(make_cloud(grid_x, grid_y, cx, cy, seed))
+
+    for i in range(int(CLUSTER_SIZE * cached_hash2d(grid_x, grid_y, seed + 1))):
+        other_x = CLUSTER_SPREAD * (2 * cached_hash2d(grid_x, grid_y, seed + i) - 0.5)
+        other_y = CLUSTER_SPREAD * (2 * cached_hash2d(grid_x, grid_y, seed - i) - 0.5)
+        clouds.append(make_cloud(grid_x, grid_y, cx + other_x, cy + other_y, seed))
     return clouds
 
 
 def make_cloud(grid_x, grid_y, cx, cy, seed):
 
-    size = 0.6 + 0.8 * hash2d(grid_x, grid_y, seed + int(cx))
-    shade = int(50 * hash2d(int(cx), grid_x & grid_y, seed - 3))
+    size = 0.6 + 0.8 * cached_hash2d(grid_x, grid_y, seed + int(cx))
+    shade = int(25 * cached_hash2d(int(cx), grid_x & grid_y, seed - 3))
 
     return (Vector(cx, cy), size, shade)
 
