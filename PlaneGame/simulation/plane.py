@@ -1,9 +1,11 @@
-import random
-from pygame.math import Vector2
-import pygame
 import math
-from .sim_consts import *
+
+import pygame
+from pygame.math import Vector2
+
+from ..colours import *
 from . import Flyer
+from .sim_consts import *
 
 
 def vec_polar(r, phi):
@@ -28,9 +30,9 @@ class Plane(Flyer):
         surface = pygame.Surface(self.rect.size, pygame.SRCALPHA)
 
         surface.fill((0, 0, 0, 0))
-        pygame.draw.circle(surface, (255, 0, 0), (20, 20), 5)
+        pygame.draw.circle(surface, RED, (20, 20), 5)
         vel = self.velocity.normalize() * 15
-        pygame.draw.circle(surface, (0, 255, 120), (20 + vel.x, vel.y + 20), 3)
+        pygame.draw.circle(surface, DEBUG_GREEN, (20 + vel.x, vel.y + 20), 3)
 
         if debug:
             pygame.draw.circle(surface, (255, 0, 0), (20, 20), HIT_RADIUS / 2, width=3)
@@ -56,7 +58,7 @@ class Plane(Flyer):
 
         pygame.draw.arc(
             win,
-            (0, 255, 120),
+            DEBUG_GREEN,
             rect,
             -self.heading + math.pi / 6,
             -self.heading - math.pi / 6,
@@ -71,7 +73,7 @@ class Plane(Flyer):
         )
         pygame.draw.arc(
             win,
-            (0, 255, 120),
+            DEBUG_GREEN,
             rect,
             -self.heading - math.pi / 6,
             -self.heading + math.pi / 6,
@@ -88,8 +90,8 @@ class Plane(Flyer):
         )
         l2_end = position + vec_polar(PLANE_VISABLE_RANGE, self.heading + math.pi / 6)
 
-        pygame.draw.line(win, (0, 255, 120), l1_start, l1_end, 3)
-        pygame.draw.line(win, (0, 255, 120), l2_start, l2_end, 3)
+        pygame.draw.line(win, DEBUG_GREEN, l1_start, l1_end, 3)
+        pygame.draw.line(win, DEBUG_GREEN, l2_start, l2_end, 3)
 
     def update(self, dt):
         self.update_movement(dt)

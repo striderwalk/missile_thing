@@ -21,6 +21,6 @@ def control_plane(plane, missiles):
 from PlaneGame import Game
 
 
-game = Game(control_plane)
+game = Game(control_plane, render=False)
 score = game.run()
 print(score)

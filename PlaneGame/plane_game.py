@@ -22,7 +22,8 @@ class Game:
         self.sim = Simulation(plane_controller, missile_controller)
 
         self.clock = pygame.time.Clock()
-        self.display = Display()
+        if self.render:
+            self.display = Display()
 
         self.start_time = pygame.time.get_ticks()
 

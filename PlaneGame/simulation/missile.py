@@ -1,12 +1,13 @@
 import math
 import random
 import uuid
+
 import pygame
 from pygame.math import Vector2 as Vector
 
-from .sim_consts import *
-
+from ..colours import *
 from . import Flyer
+from .sim_consts import *
 
 
 def random_vector():
@@ -43,28 +44,18 @@ class Missile(Flyer):
     def get_image(self, debug):
         surface = pygame.Surface(self.rect.size, pygame.SRCALPHA)
 
-        surface.fill((255, 0, 0, 0))
+        surface.fill(CLEAR)
         vel = self.velocity.normalize() * 15
 
         pygame.draw.line(
             surface,
-            (111, 111, 111),
+            MISSILE_GREY,
             (20 - vel.x / 2, 20 - vel.y / 2),
             (20 + vel.x / 2, vel.y / 2 + 20),
             5,
         )
-        if self.active:
-            pygame.draw.circle(
-                surface,
-                (
-                    255,
-                    128,
-                    255,
-                    255 if self.lifetime > FPS * 5 else 255 * self.lifetime / (FPS * 5),
-                ),
-                (20 + vel.x, 20 + vel.y),
-                2,
-            )
+
+        pygame.draw.circle(surface, DEBUG_GREEN, (20 + vel.x, 20 + vel.y), 2)
 
         if debug:
             pygame.draw.circle(surface, (255, 0, 0), (20, 20), HIT_RADIUS / 2, width=3)
