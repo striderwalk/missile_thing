@@ -34,7 +34,7 @@ def main(display=True):
     run = True
     start_time = pygame.time.get_ticks()
     while run:
-
+        
         dt = clock.tick(FPS)
 
         if display:
@@ -91,4 +91,8 @@ def main(display=True):
 
 
 if __name__ == "__main__":
+<<<<<<< HEAD
     print(main())
+=======
+    main(False)
+>>>>>>> 2ab6a07ba23aa5436473162c9e0447d0b8e2aaed
