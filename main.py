@@ -31,7 +31,7 @@ def main(display=True):
 
     run = True
     while run:
-
+        
         dt = clock.tick(FPS)
 
         if display:
@@ -83,4 +83,4 @@ def main(display=True):
 
 
 if __name__ == "__main__":
-    main()
+    main(False)
