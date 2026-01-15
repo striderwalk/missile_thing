@@ -27,8 +27,9 @@ class Plane(Flyer):
         return surface
 
     def update(self, dt):
-
         self.update_movement(dt)
+
+        return self.health > 0
 
     def hit(self):
         self.health -= 50

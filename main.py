@@ -13,6 +13,8 @@ from explosion import Explosions
 from missile import Missiles
 from plane import Plane, control_plane
 
+random.seed(1)
+
 
 def main(display=True):
 
@@ -30,6 +32,7 @@ def main(display=True):
     explosions = Explosions()
 
     run = True
+    start_time = pygame.time.get_ticks()
     while run:
 
         dt = clock.tick(FPS)
@@ -40,7 +43,8 @@ def main(display=True):
         control_plane(plane, missiles.get_visable(plane))
 
         # Updates
-        plane.update(dt)
+        alive = plane.update(dt)
+        run = alive
         missiles.update(dt, plane)
         explosions.update()
 
@@ -74,13 +78,17 @@ def main(display=True):
         # pygame events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
                 run = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    pygame.quit()
+
                     run = False
+
+    end_time = pygame.time.get_ticks()
+    pygame.quit()
+
+    return math.floor((end_time - start_time) / 1000)
 
 
 if __name__ == "__main__":
-    main()
+    print(main())
