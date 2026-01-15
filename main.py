@@ -1,52 +1,36 @@
+from plane_game import PlaneGame
 import math
-import random
 
-import pygame
-from pygame.locals import *
-
-from consts import *
-from graphics import Display
-from simulation import Simulation
-from missile_control import control_missile
-from plane_control import control_plane
-
-DRAWING = True
+"""
+plane:
+    position
+    heading
+    target_heading
 
 
-class PlaneGame:
-    def __init__(self):
-        self.sim = Simulation(control_plane, control_missile)
+missiles:
+    position
+    id
+    
 
-        self.clock = pygame.time.Clock()
-        self.display = Display()
-
-        self.start_time = pygame.time.get_ticks()
-
-    def run(self):
-
-        while self.sim.active:
-            dt = self.clock.tick(FPS)
-            self.update(dt)
-            if DRAWING:
-                if not self.display.update(self.sim):
-                    pygame.quit()
-                    return
-
-        end_time = pygame.time.get_ticks()
-        pygame.quit()
-
-        return math.floor((end_time - self.start_time) / 1000)
-
-    def update(self, dt):
-
-        self.sim.update(dt)
-
-    pygame.quit()
+ """
 
 
-if __name__ == "__main__":
-    random.seed(1)
+def distance(this, that):
+    print(f"{this=}, {that=}")
+    return math.hypot(this.x - that.x, this.y - that.y)
 
-    pygame.init()
-    game = PlaneGame()
-    game.run()
+
+def control_plane(plane, missiles):
+
+    if not missiles:
+        return
+
+    nearest = min(missiles, key=lambda x: distance(x.position, plane.position))
+
+    if distance(nearest.position, plane.position) < 55:
+        return plane.heading + math.pi / 4
+
+
+game = PlaneGame(control_plane)
+print(game.run())

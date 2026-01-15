@@ -3,6 +3,20 @@ from pygame.locals import *
 from pygame.math import Vector2
 
 from . import Explosions, Missiles, Plane, detect_colisions
+from dataclasses import dataclass
+
+
+@dataclass
+class missile_api:
+    position: Vector2
+    id: str
+
+
+@dataclass
+class plane_api:
+    position: Vector2
+    heading: float
+    target_heading: float
 
 
 class Simulation:
@@ -21,8 +35,18 @@ class Simulation:
     def update(self, dt):
         alive = self.plane.update(dt)
 
+        new_target = self.plane_controller(
+            plane_api(
+                self.plane.position, self.plane.heading, self.plane.target_heading
+            ),
+            [
+                missile_api(i.position, i.id)
+                for i in self.missiles.get_visable(self.plane)
+            ],
+        )
+        self.plane.set_target_heading(new_target)
+
         self.missiles.update(dt, self.plane, self.missile_controller)
-        self.plane_controller(self.plane, self.missiles.get_visable(self.plane))
         self.explosions.update()
 
         # Colisions

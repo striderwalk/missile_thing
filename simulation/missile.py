@@ -1,6 +1,6 @@
 import math
 import random
-
+import uuid
 import pygame
 from pygame.math import Vector2 as Vector
 
@@ -38,7 +38,7 @@ class Missile(Flyer):
 
         self.rect = pygame.Rect(self.x, self.y, 20, 20)
 
-        self.los_angle = 0
+        self.id = uuid.uuid1()
 
     def get_image(self):
         surface = pygame.Surface((40, 40), pygame.SRCALPHA)
