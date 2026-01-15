@@ -5,9 +5,9 @@ import pygame
 from pygame.locals import *
 
 from .consts import *
-from graphics import Display
-from simulation import Simulation
-from missile_control import missile_controller
+from .graphics import Display
+from .simulation import Simulation
+from .missile_control import missile_controller
 
 
 random.seed(1)
@@ -15,7 +15,7 @@ random.seed(1)
 pygame.init()
 
 
-class PlaneGame:
+class Game:
 
     def __init__(self, plane_controller, render=True):
         self.render = render

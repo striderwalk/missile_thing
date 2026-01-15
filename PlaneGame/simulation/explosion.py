@@ -1,7 +1,7 @@
 import pygame
 
 
-from colours import *
+from ..colours import *
 
 
 class Explosion:

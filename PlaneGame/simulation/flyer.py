@@ -1,7 +1,8 @@
-from pygame.math import Vector2 as Vector
-import pygame
 import math
-from consts import *
+
+from pygame.math import Vector2 as Vector
+
+from ..consts import *
 
 
 class Flyer:
@@ -32,7 +33,11 @@ class Flyer:
         self.position += self.velocity * dt
 
     def update_heading(self, dt):
+        self.heading %= 2 * math.pi
+        self.target_heading %= 2 * math.pi
+
         dheading = self.target_heading - self.heading
+
         turning_speed_dt = self.turning_speed * dt
         if abs(dheading) < turning_speed_dt:
             self.heading += dheading

@@ -5,7 +5,7 @@ from pygame.math import Vector2 as Vector
 
 from .disp_consts import *
 
-from colours import *
+from ..colours import *
 
 
 def hash2d(x, y, seed=0):

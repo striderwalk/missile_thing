@@ -1,4 +1,4 @@
-from plane_game import PlaneGame
+from PlaneGame import Game
 import math
 
 
@@ -18,8 +18,9 @@ def control_plane(plane, missiles):
         return plane.heading + math.pi / 16
 
 
-from plane_game import PlaneGame
+from PlaneGame import Game
 
-game = PlaneGame(control_plane)
+
+game = Game(control_plane)
 score = game.run()
 print(score)
