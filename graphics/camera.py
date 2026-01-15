@@ -1,6 +1,6 @@
 from pygame.math import Vector2 as Vector
 
-from consts import *
+from .disp_consts import *
 
 
 class Camera:

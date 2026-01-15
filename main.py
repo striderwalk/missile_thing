@@ -1,95 +1,52 @@
 import math
 import random
-import time
 
 import pygame
 from pygame.locals import *
 
-from camera import Camera
-from clouds import make_background
-from collisions import detect_colisions
 from consts import *
-from explosion import Explosions
-from missile import Missiles
-from plane import Plane, control_plane
+from graphics import Display
+from simulation import Simulation
+from missile_control import control_missile
+from plane_control import control_plane
 
-random.seed(1)
+DRAWING = True
 
 
-def main(display=True):
+class PlaneGame:
+    def __init__(self):
+        self.sim = Simulation(control_plane, control_missile)
 
-    pygame.init()
-    clock = pygame.time.Clock()
+        self.clock = pygame.time.Clock()
+        self.display = Display()
 
-    if display:
-        myfont = pygame.font.SysFont("Arial", 32)
-        win = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-        camera = Camera()
+        self.start_time = pygame.time.get_ticks()
 
-    plane = Plane(pygame.math.Vector2(0, 0))
-    missiles = Missiles()
-    missiles.spawn_missile(plane)
-    explosions = Explosions()
+    def run(self):
 
-    run = True
-    start_time = pygame.time.get_ticks()
-    while run:
+        while self.sim.active:
+            dt = self.clock.tick(FPS)
+            self.update(dt)
+            if DRAWING:
+                if not self.display.update(self.sim):
+                    pygame.quit()
+                    return
 
-        dt = clock.tick(FPS)
+        end_time = pygame.time.get_ticks()
+        pygame.quit()
 
-        if display:
-            pygame.display.flip()
+        return math.floor((end_time - self.start_time) / 1000)
 
-        control_plane(plane, missiles.get_visable(plane))
+    def update(self, dt):
 
-        # Updates
-        alive = plane.update(dt)
-        run = alive
-        missiles.update(dt, plane)
-        explosions.update()
+        self.sim.update(dt)
 
-        # Colisions
-        colisions = detect_colisions(plane, missiles)
-        for colision in colisions:
-            explosions.add(colision)
-
-        # Draw
-        if not display:
-            continue
-
-        camera.update(plane)
-        # Clouds ect.
-        background = make_background(camera.position)
-        win.blit(background, (0, 0))
-
-        # others
-        win.blit(plane.get_image(), camera.apply(plane.position))
-        missiles.draw(win, camera)
-        explosions.draw(win, camera)
-
-        # debug
-        label = myfont.render(
-            f"HITS:{plane.hits:>3}, FPS:{clock.get_fps():.2f}",
-            1,
-            (128, 255, 128),
-        )
-        win.blit(label, (10, 10))
-
-        # pygame events
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-
-                    run = False
-
-    end_time = pygame.time.get_ticks()
     pygame.quit()
-
-    return math.floor((end_time - start_time) / 1000)
 
 
 if __name__ == "__main__":
+    random.seed(1)
 
-    print(main())
+    pygame.init()
+    game = PlaneGame()
+    game.run()

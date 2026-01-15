@@ -3,7 +3,9 @@ import math
 import pygame
 from pygame.math import Vector2 as Vector
 
-from consts import *
+from .disp_consts import *
+
+from colours import *
 
 
 def hash2d(x: int, y: int, seed: int = 0) -> float:

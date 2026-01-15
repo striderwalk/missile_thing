@@ -2,6 +2,8 @@ import pygame
 
 from consts import *
 
+from colours import *
+
 
 class Explosion:
     def __init__(self, position):

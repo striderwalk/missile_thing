@@ -4,8 +4,9 @@ import random
 import pygame
 from pygame.math import Vector2 as Vector
 
-from consts import *
-from flyer import Flyer
+from .sim_consts import *
+
+from . import Flyer
 
 
 def random_vector():
@@ -17,6 +18,9 @@ def distance(this, that):
     a = this.position
     b = that.position
     return math.hypot(a.x - b.x, a.y - b.y)
+
+
+FPS = 120
 
 
 class Missile(Flyer):
@@ -105,13 +109,13 @@ class Missiles:
         for missile in self.missiles:
             win.blit(missile.get_image(), camera.apply(missile.position))
 
-    def update(self, dt, plane):
+    def update(self, dt, plane, controller):
         if len(self.missiles) < MISSILE_NUMBER:
             self.spawn_missile(plane)
         removals = []
         for missile in self.missiles:
             if missile.active and not missile.been_hit:
-                control_missile(missile, plane, dt)
+                controller(missile, plane, dt)
                 missile.update(dt, plane)
             else:
                 removals.append(missile)
@@ -138,21 +142,3 @@ class Missiles:
                     visable.append(missile)
 
         return visable
-
-
-def control_missile(missile, plane, dt):
-    m2p = -missile.position + plane.position
-
-    t = math.atan2(m2p.y, m2p.x)
-
-    if not missile.has_seen_plane:
-
-        missile.heading = t
-        missile.target_heading = t
-
-    missile.target_heading = t
-    # new_heading, los_angle = missile_guidance(missile, plane, missile.los_angle, dt)
-    # missile.set_target_heading(new_heading)
-    # missile.los_angle = los_angle
-
-

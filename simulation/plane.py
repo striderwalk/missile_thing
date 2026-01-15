@@ -1,16 +1,16 @@
 import random
-from pygame.math import Vector2 as Vector
+from pygame.math import Vector2
 import pygame
 import math
-from consts import *
-from flyer import Flyer
+from .sim_consts import *
+from . import Flyer
 
 
 class Plane(Flyer):
     max_speed = PLANE_SPEED
     turning_speed = PLANE_TURNING_SPEED
 
-    def __init__(self, position=Vector(0, 0)):
+    def __init__(self, position=Vector2(0, 0)):
         super().__init__(position)
         self.health = 100
         self.hits = 0
@@ -26,27 +26,12 @@ class Plane(Flyer):
 
         return surface
 
+    def draw(self, win, camera):
+        win.blit(self.get_image(), camera.apply(self.position))
+
     def update(self, dt):
         self.update_movement(dt)
-
-        return self.health > 0
 
     def hit(self):
         self.health -= 50
         self.hits += 1
-
-
-def distance(this, that):
-    a = this.position
-    b = that.position
-    return math.hypot(a.x - b.x, a.y - b.y)
-
-
-def control_plane(plane, missiles):
-
-    if not missiles:
-        return
-    nearest = min(missiles, key=lambda x: distance(x, plane))
-
-    if distance(nearest, plane) < 55:
-        plane.set_target_heading(plane.heading + math.pi / 4)
