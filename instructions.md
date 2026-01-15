@@ -1,7 +1,7 @@
 Write a function that takes two arguments plane and missiles and returns a new target heading for the plane based on the positions of the missiles. If `None` is returned the plane will keep its current target heading.
 
-The plane travels at a constant speed of (100 m/s) and can turn at 3.14 radians per second. Missiles can travel at 150 m/s but can only turn at 2.6 radians per second.
-The planes visible range is 150m in every direction, but between $\frac{\pi}{6}$ radians either side of its current heading it can see up to 300m.
+The plane travels at a constant speed of (100 m/s) and can turn at $\pi$ radians per second. Missiles can travel at 150 m/s but can only turn at $\frac{1}{2}\pi$ radians per second.
+The planes visible range is 150m in every direction, but between $\frac{1}{6}\pi$ radians either side of its current heading it can see up to 300m.
 
 ```python
 from plane_game import PlaneGame
