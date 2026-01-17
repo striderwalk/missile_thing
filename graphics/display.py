@@ -11,7 +11,7 @@ class Display:
         self.camera = Camera()
         self.debug_veiw = False
 
-    def update(self, sim):
+    def update(self, sim) -> bool:
 
         pygame.display.flip()
 

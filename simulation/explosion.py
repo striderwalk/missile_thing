@@ -1,3 +1,4 @@
+from pygame.math import Vector2
 import pygame
 
 
@@ -11,7 +12,7 @@ class Explosion:
         self.lifetime = 10
         self.active = True
 
-    def get_image(self):
+    def get_image(self) -> pygame.Surface:
         surface = pygame.Surface((40, 40), pygame.SRCALPHA)
 
         surface.fill((0, 0, 0, 0))
@@ -29,10 +30,10 @@ class Explosions:
 
         self.explosions = []
 
-    def add(self, position):
+    def add(self, position: Vector2):
         self.explosions.append(Explosion(position))
 
-    def remove(self, explosion):
+    def remove(self, explosion: Explosion):
         self.explosions.remove(explosion)
 
     def update(self):
@@ -47,6 +48,6 @@ class Explosions:
         for explosion in removals:
             self.remove(explosion)
 
-    def draw(self, win, camera):
+    def draw(self, win: pygame.Surface, camera):
         for explosion in self.explosions:
             win.blit(explosion.get_image(), camera.apply(explosion.position))

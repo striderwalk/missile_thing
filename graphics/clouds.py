@@ -8,16 +8,16 @@ from .disp_consts import *
 from ..colours import *
 
 
-def hash2d(x, y, seed=0):
+def hash2d(x: int, y: int, seed: int = 0) -> float:
     n = int(x * 374761393 + y * 668265263 + seed * 1442695040888963407)
     n = (n ^ (n >> 13)) * 1274126177
     n = n ^ (n >> 16)
     return (n & 0xFFFFFFFF) / 0x100000000
 
 
-def cached_hash2d(x, y, seed=0):
+def cached_hash2d(x: int, y: int, seed: int = 0) -> float:
 
-    cache = {}
+    cache: dict[tuple[int, int, int], float] = {}
     if (x, y, seed) in cache:
         return cache[(x, y, seed)]
 
@@ -25,7 +25,9 @@ def cached_hash2d(x, y, seed=0):
     return cache[(x, y, seed)]
 
 
-def get_clouds(cam_x, cam_y, cam_w, cam_h, seed=1):
+def get_clouds(
+    cam_x: float, cam_y: float, cam_w: float, cam_h: float, seed: int = 1
+) -> list[tuple]:
 
     clouds = []
 
@@ -48,7 +50,7 @@ def get_clouds(cam_x, cam_y, cam_w, cam_h, seed=1):
     return clouds
 
 
-def grid_clouds(grid_x, grid_y, seed):
+def grid_clouds(grid_x: int, grid_y: int, seed: int) -> list[tuple]:
     clouds = []
     offset_x = cached_hash2d(grid_x, grid_y, seed + 1)
     offset_y = cached_hash2d(grid_x, grid_y, seed + 2)
@@ -65,7 +67,7 @@ def grid_clouds(grid_x, grid_y, seed):
     return clouds
 
 
-def make_cloud(grid_x, grid_y, cx, cy, seed):
+def make_cloud(grid_x: int, grid_y: int, cx: float, cy: float, seed: int) -> tuple:
 
     size = 0.6 + 0.8 * cached_hash2d(grid_x, grid_y, seed + int(cx))
     shade = int(25 * cached_hash2d(int(cx), grid_x & grid_y, seed - 3))
@@ -73,7 +75,7 @@ def make_cloud(grid_x, grid_y, cx, cy, seed):
     return (Vector(cx, cy), size, shade)
 
 
-def make_background(world_position, margin=1000):
+def make_background(world_position: Vector, margin: int = 1000) -> pygame.Surface:
 
     padded_surface = pygame.Surface(
         (SCREEN_WIDTH + margin * 2, SCREEN_HEIGHT + margin * 2), pygame.SRCALPHA

@@ -4,7 +4,7 @@ The plane travels at a constant speed of (100 m/s) and can turn at $\pi$ radians
 The planes visible range is 150m in every direction, but between $\frac{1}{6}\pi$ radians either side of its current heading it can see up to 300m.
 
 ```python
-from plane_game import PlaneGame
+from PlaneGame import Game
 
 
 def control(plane, missiles):
@@ -24,7 +24,7 @@ def control(plane, missiles):
 This is the code needed to run the game with your control function. By default this will launch a window to see the game, to disable the window pass `render=False` to `PlaneGame`.
 
 ```python
-game = PlaneGame(control)
+game = Game(control)
 score = game.run()
 
 ```

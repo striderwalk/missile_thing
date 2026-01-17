@@ -1,7 +1,7 @@
 from .flyer import Flyer
 
 from .explosion import Explosions
-from .missile import Missiles
+from .missile import Missiles, Missile
 from .plane import Plane
 from .collisions import detect_colisions
 

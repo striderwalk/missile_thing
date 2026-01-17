@@ -1,3 +1,4 @@
+from collections.abc import Callable
 import math
 import random
 import uuid
@@ -10,18 +11,14 @@ from . import Flyer
 from .sim_consts import *
 
 
-def random_vector():
+def random_vector() -> Vector:
     t = random.uniform(0, 2 * math.pi)
     return Vector(math.cos(t), math.sin(t))
 
 
-def distance(this, that):
-    a = this.position
-    b = that.position
-    return math.hypot(a.x - b.x, a.y - b.y)
+def distance(this: Vector, that: Vector) -> float:
 
-
-FPS = 120
+    return math.hypot(this.x - that.x, this.y - that.y)
 
 
 class Missile(Flyer):
@@ -29,7 +26,7 @@ class Missile(Flyer):
     max_speed = MISSILE_SPEED
     turning_speed = MISSILE_TURNING_RADIUS
 
-    def __init__(self, position, velocity):
+    def __init__(self, position: Vector, velocity: Vector):
         super().__init__(position, velocity)
 
         self.has_seen_plane = False
@@ -41,7 +38,7 @@ class Missile(Flyer):
 
         self.id = uuid.uuid1()
 
-    def get_image(self, debug):
+    def get_image(self, debug: bool) -> pygame.Surface:
         surface = pygame.Surface(self.rect.size, pygame.SRCALPHA)
 
         surface.fill(CLEAR)
@@ -66,21 +63,21 @@ class Missile(Flyer):
         self.been_hit = True
         self.active = False
 
-    def update(self, dt, plane):
+    def update(self, dt: float, plane):
 
         self.lifetime -= 1
         if self.lifetime < 0:
             self.active = False
             return
 
-        if distance(self, plane) > SPAWN_RADIUS * 1.5:
+        if distance(self.position, plane.position) > SPAWN_RADIUS * 1.5:
             self.active = False
             return
 
         if not self.active:
             return
 
-        self.has_seen_plane |= distance(self, plane) < 35
+        self.has_seen_plane |= distance(self.position, plane.position) < 35
 
         self.update_movement(dt)
 
@@ -93,19 +90,20 @@ class Missiles:
     def __iter__(self):
         yield from self.missiles
 
-    def add(self, missile):
+    def add(self, missile: Missile):
         self.missiles.append(missile)
 
-    def remove(self, missile):
+    def remove(self, missile: Missile):
         self.missiles.remove(missile)
 
-    def draw(self, win, camera, debug=False):
+    def draw(self, win: pygame.Surface, camera, debug: bool = False):
         for missile in self.missiles:
             win.blit(
                 missile.get_image(debug), camera.apply(missile.position, missile.rect)
             )
 
-    def update(self, dt, plane, controller):
+    def update(self, dt: float, plane, controller: Callable):
+
         if len(self.missiles) < MISSILE_NUMBER:
             self.spawn_missile(plane)
         removals = []
@@ -126,7 +124,7 @@ class Missiles:
         # turn a lil bit
         self.add(Missile(position, missileToPlane))
 
-    def get_visable(self, plane):
+    def get_visable(self, plane) -> list[Missile]:
         visable = []
         for missile in self.missiles:
             dis = distance(missile, plane)

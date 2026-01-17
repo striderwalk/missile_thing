@@ -9,14 +9,16 @@ class Camera:
         self.position = Vector(0, 0)
 
     @property
-    def x(self):
+    def x(self) -> float:
         return self.position.x
 
     @property
-    def y(self):
+    def y(self) -> float:
         return self.position.y
 
-    def apply(self, position, rect=pygame.Rect(0, 0, 0, 0)):
+    def apply(
+        self, position: Vector, rect: pygame.Rect = pygame.Rect(0, 0, 0, 0)
+    ) -> Vector:
 
         return (
             position
@@ -25,6 +27,6 @@ class Camera:
             - Vector(rect.size) / 2
         )
 
-    def update(self, plane):
+    def update(self, plane) -> None:
 
         self.position = plane.position

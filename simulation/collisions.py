@@ -1,15 +1,17 @@
 import math
+from typing import List
+
+from pygame import Vector2
 
 from .sim_consts import *
 
 
-def distance(this, that):
-    a = this.position
-    b = that.position
-    return math.hypot(a.x - b.x, a.y - b.y)
+def distance(this: Vector2, that: Vector2) -> float:
+
+    return math.hypot(this.x - that.x, this.y - that.y)
 
 
-def detect_colisions(plane, missiles):
+def detect_colisions(plane, missiles) -> List[Vector2]:
 
     hit_list = []
     for missile in missiles:
@@ -26,7 +28,7 @@ def detect_colisions(plane, missiles):
                 continue
             if missile is other:
                 continue
-            if distance(missile, other) < HIT_RADIUS:
+            if distance(missile.position, other.position) < HIT_RADIUS:
                 hit_list.append(missile.position)
 
                 missile.hit()

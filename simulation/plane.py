@@ -17,7 +17,7 @@ class Plane(Flyer):
     max_speed = PLANE_SPEED
     turning_speed = PLANE_TURNING_SPEED
 
-    def __init__(self, position=Vector2(0, 0)):
+    def __init__(self, position: Vector2 = Vector2(0, 0)):
         super().__init__(position)
         self.health = 3
         self.hits = 0
@@ -26,7 +26,7 @@ class Plane(Flyer):
 
         self.rect = pygame.Rect(0, 0, 40, 40)
 
-    def get_image(self, debug):
+    def get_image(self, debug: bool = False):
         surface = pygame.Surface(self.rect.size, pygame.SRCALPHA)
 
         surface.fill((0, 0, 0, 0))
@@ -39,13 +39,13 @@ class Plane(Flyer):
 
         return surface
 
-    def draw(self, win, camera, debug=False):
+    def draw(self, win: pygame.Surface, camera, debug: bool = False):
         win.blit(self.get_image(debug), camera.apply(self.position, self.rect))
 
         if debug:
             self.draw_debug(win, camera)
 
-    def draw_debug(self, win, camera):
+    def draw_debug(self, win: pygame.Surface, camera):
 
         position = camera.apply(self.position)
 
@@ -93,7 +93,7 @@ class Plane(Flyer):
         pygame.draw.line(win, DEBUG_GREEN, l1_start, l1_end, 3)
         pygame.draw.line(win, DEBUG_GREEN, l2_start, l2_end, 3)
 
-    def update(self, dt):
+    def update(self, dt: float):
         self.update_movement(dt)
 
     def hit(self):

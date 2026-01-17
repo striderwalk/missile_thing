@@ -1,27 +1,35 @@
+from collections.abc import Callable
+from dataclasses import dataclass
+from uuid import UUID
+
 import pygame
 from pygame.locals import *
 from pygame.math import Vector2
 
-from . import Explosions, Missiles, Plane, detect_colisions
-from dataclasses import dataclass
+from . import Explosions, Missiles, Missile, Plane, detect_colisions
 
 
 @dataclass
 class missile_api:
     position: Vector2
-    id: str
+    id: UUID
 
 
 @dataclass
 class plane_api:
     position: Vector2
+    health: int
     heading: float
     target_heading: float
 
 
 class Simulation:
 
-    def __init__(self, plane_controller, missile_controller):
+    def __init__(
+        self,
+        plane_controller: Callable[[plane_api, list[missile_api]], float],
+        missile_controller: Callable[[Missile, Plane], None],
+    ):
         self.plane = Plane(Vector2(0, 0))
         self.plane_controller = plane_controller
         self.missile_controller = missile_controller
@@ -29,15 +37,18 @@ class Simulation:
         self.explosions = Explosions()
 
     @property
-    def active(self):
+    def active(self) -> bool:
         return self.plane.health > 0
 
-    def update(self, dt):
+    def update(self, dt: float):
         alive = self.plane.update(dt)
 
         new_target = self.plane_controller(
             plane_api(
-                self.plane.position, self.plane.heading, self.plane.target_heading
+                self.plane.position,
+                self.plane.health,
+                self.plane.heading,
+                self.plane.target_heading,
             ),
             [
                 missile_api(i.position, i.id)

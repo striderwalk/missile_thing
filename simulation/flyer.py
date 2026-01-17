@@ -6,33 +6,27 @@ from ..consts import *
 
 
 class Flyer:
-    max_speed = 1
-    turning_speed = 1
+    max_speed: float = 1
+    turning_speed: float = 1
 
-    def __init__(self, position, velocity=Vector(0, 1)):
-        self.position = position
-        self.velocity = velocity
-        self.heading = 0
-        self.target_heading = 0
+    def __init__(self, position: Vector, velocity: Vector = Vector(0, 1)):
+        self.position: Vector = position
+        self.velocity: Vector = velocity
+        self.heading: float = 0
+        self.target_heading: float = 0
 
     @property
-    def x(self):
+    def x(self) -> float:
         return self.position.x
 
     @property
-    def y(self):
+    def y(self) -> float:
         return self.position.y
 
     def limit_speed(self):
         self.velocity = self.velocity.normalize() * self.max_speed
 
-    def update_movement(self, dt):
-
-        self.update_heading(dt)
-        self.limit_speed()
-        self.position += self.velocity * dt
-
-    def update_heading(self, dt):
+    def update_heading(self, dt: float):
         self.heading %= 2 * math.pi
         self.target_heading %= 2 * math.pi
 
@@ -48,6 +42,12 @@ class Flyer:
         new_y = math.sin(self.heading)
         self.velocity = Vector(new_x, new_y)
 
-    def set_target_heading(self, angle):
+    def set_target_heading(self, angle: float):
 
         self.target_heading = angle
+
+    def update_movement(self, dt: float):
+
+        self.update_heading(dt)
+        self.limit_speed()
+        self.position += self.velocity * dt

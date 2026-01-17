@@ -1,3 +1,4 @@
+from collections.abc import Callable
 import math
 import random
 
@@ -17,7 +18,7 @@ pygame.init()
 
 class Game:
 
-    def __init__(self, plane_controller, render=True):
+    def __init__(self, plane_controller: Callable, render: bool = True):
         self.render = render
         self.sim = Simulation(plane_controller, missile_controller)
 
@@ -27,7 +28,7 @@ class Game:
 
         self.start_time = pygame.time.get_ticks()
 
-    def run(self):
+    def run(self) -> int | None:
 
         while self.sim.active:
             dt = self.clock.tick(FPS) / 1000
@@ -37,7 +38,7 @@ class Game:
 
                 if not self.display.update(self.sim):
                     pygame.quit()
-                    return
+                    return None
 
         end_time = pygame.time.get_ticks()
         pygame.quit()
