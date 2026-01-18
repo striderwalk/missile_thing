@@ -34,9 +34,11 @@ class Flyer:
 
         dheading = (dheading + math.pi) % (2 * math.pi) - math.pi
         turning_speed_dt = self.turning_speed * dt
+
         if abs(dheading) < turning_speed_dt:
             self.heading += dheading
         else:
+
             self.heading += turning_speed_dt * dheading / abs(dheading)
 
         new_x = math.cos(self.heading)

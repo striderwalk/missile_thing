@@ -19,7 +19,7 @@ class Plane(Flyer):
 
     def __init__(self, position: Vector2 = Vector2(0, 0)):
         super().__init__(position)
-        self.health = 3
+        self.health = 5
         self.hits = 0
         self.heading = -math.pi / 2
         self.target_heading = -math.pi / 2
