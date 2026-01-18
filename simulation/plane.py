@@ -29,7 +29,6 @@ class Plane(Flyer):
     def get_image(self, debug: bool = False):
         surface = pygame.Surface(self.rect.size, pygame.SRCALPHA)
 
-        surface.fill((0, 0, 0, 0))
         pygame.draw.circle(surface, RED, (20, 20), 5)
         vel = self.velocity.normalize() * 15
         pygame.draw.circle(surface, DEBUG_GREEN, (20 + vel.x, vel.y + 20), 3)

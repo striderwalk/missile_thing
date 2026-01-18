@@ -7,6 +7,7 @@ from .disp_consts import *
 class Camera:
     def __init__(self):
         self.position = Vector(0, 0)
+        self.rect = pygame.Rect((0, 0), (SCREEN_WIDTH, SCREEN_HEIGHT))
 
     @property
     def x(self) -> float:
@@ -22,11 +23,13 @@ class Camera:
 
         return (
             position
+            - Vector(rect.size) / 2
             - self.position
             + Vector(SCREEN_WIDTH, SCREEN_HEIGHT) / 2
-            - Vector(rect.size) / 2
         )
 
     def update(self, plane) -> None:
 
         self.position = plane.position
+
+        self.rect.center = self.position

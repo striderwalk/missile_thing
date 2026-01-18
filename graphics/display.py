@@ -1,6 +1,6 @@
 import pygame
 
-from . import Camera, make_background
+from . import Camera, Background
 from .disp_consts import *
 
 
@@ -10,16 +10,17 @@ class Display:
         self.win = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.camera = Camera()
         self.debug_veiw = False
+        self.background = Background()
 
     def update(self, sim) -> bool:
 
         pygame.display.flip()
 
-        background = make_background(self.camera.position)
-        self.win.blit(background, (0, 0))
-
         self.camera.update(sim.plane)
 
+        self.background.update(self.camera.rect)
+
+        self.background.draw(self.win, self.camera, self.debug_veiw)
         sim.plane.draw(self.win, self.camera, self.debug_veiw)
         sim.missiles.draw(self.win, self.camera, self.debug_veiw)
 

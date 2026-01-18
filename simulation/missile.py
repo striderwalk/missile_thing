@@ -109,7 +109,7 @@ class Missiles:
         removals = []
         for missile in self.missiles:
             if missile.active and not missile.been_hit:
-                controller(missile, plane, dt)
+                controller(missile, plane)
                 missile.update(dt, plane)
             else:
                 removals.append(missile)

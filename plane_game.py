@@ -32,6 +32,7 @@ class Game:
 
         while self.sim.active:
             dt = self.clock.tick(FPS) / 1000
+            pygame.display.set_caption(f"{self.clock.get_fps():.0f}")
 
             self.update(dt)
             if self.render:
