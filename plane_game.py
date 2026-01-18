@@ -14,6 +14,53 @@ from .simulation import Simulation
 random.seed(1)
 
 pygame.init()
+import time
+
+
+class Clock:
+    def __init__(self, time_scale=1):
+        self.time_passed = 0.0
+        self.prev_time = time.perf_counter()
+        self.time_scale = time_scale
+
+    def tick(self, FPS):
+        cur_time = time.perf_counter()
+        dt = cur_time - self.prev_time
+
+        remaining = (1 / (FPS * self.time_scale)) - dt
+        if remaining > 0:
+            time.sleep(remaining)
+            cur_time = time.perf_counter()
+            dt = cur_time - self.prev_time
+
+        self.time_passed += dt * self.time_scale
+        self.prev_time = cur_time
+        return dt * self.time_scale
+
+
+pygame.event.set_allowed([QUIT, KEYDOWN, KEYUP])
+
+
+class Clock:
+    def __init__(self, time_scale=1):
+        self.time_passed = 0.0
+        self.prev_time = time.perf_counter()
+        self.time_scale = time_scale
+
+    def tick(self, FPS):
+        cur_time = time.perf_counter()
+        dt = cur_time - self.prev_time
+
+        remaining = (1 / (FPS * self.time_scale)) - dt
+        if remaining > 0:
+            time.sleep(remaining)
+            cur_time = time.perf_counter()
+            dt = cur_time - self.prev_time
+
+        self.time_passed += dt * self.time_scale
+        self.prev_time = cur_time
+        return dt * self.time_scale
+
 
 pygame.event.set_allowed([QUIT, KEYDOWN, KEYUP])
 
