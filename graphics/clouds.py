@@ -138,10 +138,10 @@ class CloudCluster:
         )
 
     def make_image(self):
-
-        surface = pygame.Surface(self.rect.size, pygame.SRCALPHA)
-        surface.fill(CLEAR)
-
+        surface = pygame.Surface(
+            4 * Vector2((CLOUD_SIZE + CLUSTER_SPREAD), (CLOUD_SIZE + CLUSTER_SPREAD)),
+            pygame.SRCALPHA,
+        )
         for cloud in self.clouds:
 
             self.draw_cloud(

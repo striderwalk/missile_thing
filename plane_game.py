@@ -1,53 +1,82 @@
-from collections.abc import Callable
 import math
 import random
+import time
+from collections.abc import Callable
 
 import pygame
 from pygame.locals import *
 
 from .consts import *
 from .graphics import Display
-from .simulation import Simulation
 from .missile_control import missile_controller
-
+from .simulation import Simulation
 
 random.seed(1)
 
 pygame.init()
 
+pygame.event.set_allowed([QUIT, KEYDOWN, KEYUP])
+
+
+class Clock:
+    def __init__(self, time_scale=1):
+        self.time_passed = 0.0
+        self.prev_time = time.perf_counter()
+        self.time_scale = time_scale
+
+    def tick(self, FPS):
+        cur_time = time.perf_counter()
+        dt = cur_time - self.prev_time
+
+        remaining = (1 / (FPS * self.time_scale)) - dt
+        if remaining > 0:
+            time.sleep(remaining)
+            cur_time = time.perf_counter()
+            dt = cur_time - self.prev_time
+
+        self.time_passed += dt * self.time_scale
+        self.prev_time = cur_time
+        return dt * self.time_scale
+
 
 class Game:
 
-    def __init__(self, plane_controller: Callable, render: bool = True):
+    def __init__(
+        self,
+        plane_controller: Callable,
+        render: bool = True,
+        accelerate: float = 1,
+    ):
         self.render = render
         self.sim = Simulation(plane_controller, missile_controller)
 
-        self.clock = pygame.time.Clock()
+        self.clock = Clock(accelerate)  # pygame.time.Clock()
+        self.clock.tick(FPS)
+
         if self.render:
             self.display = Display()
 
-        self.start_time = pygame.time.get_ticks()
-
     def run(self) -> int | None:
 
-        while self.sim.active:
-            dt = self.clock.tick(FPS) / 1000
-            pygame.display.set_caption(f"{self.clock.get_fps():.0f}")
+        dt = self.clock.tick(FPS)
 
-            self.update(dt)
+        while self.sim.active:
+
+            dt = self.clock.tick(FPS)
+
             if self.render:
+                # pygame.display.set_caption(f"{self.clock.get_fps():.0f}")
 
                 if not self.display.update(self.sim):
                     pygame.quit()
                     return None
 
-        end_time = pygame.time.get_ticks()
+            self.update(dt)
+
         pygame.quit()
 
-        return math.floor((end_time - self.start_time) / 1000)
+        return math.floor(self.clock.time_passed)
 
     def update(self, dt):
 
         self.sim.update(dt)
-
-    pygame.quit()
