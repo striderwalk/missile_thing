@@ -27,11 +27,12 @@ class Flyer:
         self.velocity = self.velocity.normalize() * self.max_speed
 
     def update_heading(self, dt: float):
-        self.heading %= 2 * math.pi
-        self.target_heading %= 2 * math.pi
+
+        # self.target_heading %= 2 * math.pi
 
         dheading = self.target_heading - self.heading
 
+        dheading = (dheading + math.pi) % (2 * math.pi) - math.pi
         turning_speed_dt = self.turning_speed * dt
         if abs(dheading) < turning_speed_dt:
             self.heading += dheading
