@@ -104,7 +104,7 @@ class Missiles:
 
     def update(self, dt: float, plane, controller: Callable):
 
-        if len(self.missiles) < MISSILE_NUMBER:
+        while len(self.missiles) < MISSILE_NUMBER:
             self.spawn_missile(plane)
         removals = []
         for missile in self.missiles:

@@ -19,8 +19,9 @@ class Plane(Flyer):
 
     def __init__(self, position: Vector2 = Vector2(0, 0)):
         super().__init__(position)
-        self.health = 5
+        self.health = 1
         self.hits = 0
+        self.been_hit = False
         self.heading = -math.pi / 2
         self.target_heading = -math.pi / 2
 
@@ -93,8 +94,10 @@ class Plane(Flyer):
         pygame.draw.line(win, DEBUG_GREEN, l2_start, l2_end, 3)
 
     def update(self, dt: float):
+        self.been_hit = False
         self.update_movement(dt)
 
     def hit(self):
         self.health -= 1
         self.hits += 1
+        self.been_hit = True

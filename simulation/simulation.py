@@ -21,6 +21,7 @@ class plane_api:
     health: int
     heading: float
     target_heading: float
+    been_hit: bool
 
 
 class Simulation:
@@ -43,23 +44,25 @@ class Simulation:
     def update(self, dt: float):
         alive = self.plane.update(dt)
 
+        self.missiles.update(dt, self.plane, self.missile_controller)
+        self.explosions.update()
+
         new_target = self.plane_controller(
             plane_api(
                 self.plane.position,
                 self.plane.health,
                 self.plane.heading,
                 self.plane.target_heading,
+                self.plane.been_hit,
             ),
             [
                 missile_api(i.position, i.id)
                 for i in self.missiles.get_visable(self.plane)
             ],
         )
+
         if new_target:
             self.plane.set_target_heading(new_target)
-
-        self.missiles.update(dt, self.plane, self.missile_controller)
-        self.explosions.update()
 
         # Colisions
         colisions = detect_colisions(self.plane, self.missiles)

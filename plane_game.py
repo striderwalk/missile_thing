@@ -11,7 +11,6 @@ from .graphics import Display
 from .missile_control import missile_controller
 from .simulation import Simulation
 
-random.seed(1)
 
 pygame.init()
 import time
